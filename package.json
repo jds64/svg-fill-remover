@@ -1,0 +1,16 @@
+{
+  "name": "svg-fill-remover",
+  "version": "1.0.0",
+  "description": "Does what it says on the tin. Removes fills from SVG files. Drop 'em in the 'in' folder, run the executable, find the processed files in the 'out' folder. Simple as.",
+  "main": "svg-fill-remover",
+  "bin": "./svg-fill-remover",
+  "scripts": {
+    "start": "node ./svg-fill-remover"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "pkg": {
+    "outputPath": "bin"
+  }
+}

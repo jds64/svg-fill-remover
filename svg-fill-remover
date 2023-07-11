@@ -1,0 +1,89 @@
+#! /usr/bin/env node
+// Run as Node executable
+
+const fs = require("fs");
+const path = require("path");
+
+const inPath = "in";
+const outPath = "out";
+
+// entry point
+async function main() {
+  const pkgInPath = process?.pkg
+    ? path.resolve(process.execPath, "..", "..", "in")
+    : null;
+  const pkgOutPath = process?.pkg
+    ? path.resolve(process.execPath, "..", "..", "out")
+    : null;
+
+  if (process?.pkg && pkgInPath && !fs.existsSync(pkgInPath)) {
+    fs.mkdirSync(pkgInPath);
+  }
+
+  if (process?.pkg && pkgOutPath && !fs.existsSync(pkgOutPath)) {
+    fs.mkdirSync(pkgOutPath);
+  }
+
+  if (!process?.pkg && !fs.existsSync(path.join(__dirname, inPath))) {
+    fs.mkdirSync(path.join(__dirname, inPath));
+  }
+
+  if (!process?.pkg && !fs.existsSync(path.join(__dirname, outPath))) {
+    fs.mkdirSync(path.join(__dirname, outPath));
+  }
+
+  const filesIn = fs
+    .readdirSync(process?.pkg ? pkgInPath : path.join(__dirname, inPath))
+    .filter((x) => x.endsWith(".svg"));
+  let replaced = 0;
+  let processed = 0;
+
+  if (!filesIn?.length) {
+    console.error(
+      "No SVG files found! Please place some SVG files in the 'in' directory and run me again."
+    );
+    process.exit(0);
+  }
+
+  filesIn?.forEach(async (file) => {
+    console.info(`Processing file: ${file}...`);
+
+    // read the file as buffer
+    const fileBuffer = fs.readFileSync(
+      process?.pkg
+        ? path.join(pkgInPath, file)
+        : path.join(__dirname, inPath, file)
+    );
+
+    // check the file contents for svg header
+    const fileString = fileBuffer.toString();
+    if (!fileString.includes("<svg")) {
+      throw new Error("File not a valid SVG: " + file);
+      return;
+    }
+
+    const occurrences = [...fileString.matchAll(/fill\=\".+\"/gi)].length;
+
+    // replace the file's "fill" contents
+    if (occurrences) {
+      let modified = fileString.replaceAll(/fill\=".+"/gi, " ");
+      replaced += occurrences;
+
+      fs.writeFileSync(
+        process?.pkg
+          ? path.join(pkgOutPath, file)
+          : path.join(__dirname, outPath, file),
+        modified
+      );
+      processed += 1;
+    } else {
+      console.warn(`No fills found, skipping ${file}!`);
+    }
+  });
+
+  console.info("\n\n");
+  console.info("Finished!");
+  console.info(`Replaced a total of ${replaced} fills in ${processed} files.`);
+}
+
+main();
