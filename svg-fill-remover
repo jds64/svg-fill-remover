@@ -42,7 +42,7 @@ async function main() {
     console.error(
       "No SVG files found! Please place some SVG files in the 'in' directory and run me again."
     );
-    process.exit(0);
+    return;
   }
 
   filesIn?.forEach(async (file) => {
@@ -81,9 +81,15 @@ async function main() {
     }
   });
 
-  console.info("\n\n");
+  console.info("\n");
   console.info("Finished!");
   console.info(`Replaced a total of ${replaced} fills in ${processed} files.`);
+
+
+  console.log("\nExiting...");
+  setTimeout(() => {
+    process.exit(0);
+  }, 5000);
 }
 
 main();
