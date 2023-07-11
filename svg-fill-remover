@@ -10,10 +10,10 @@ const outPath = "out";
 // entry point
 async function main() {
   const pkgInPath = process?.pkg
-    ? path.resolve(process.execPath, "..", "..", "in")
+    ? path.resolve(process.execPath, "..", "in")
     : null;
   const pkgOutPath = process?.pkg
-    ? path.resolve(process.execPath, "..", "..", "out")
+    ? path.resolve(process.execPath, "..", "out")
     : null;
 
   if (process?.pkg && pkgInPath && !fs.existsSync(pkgInPath)) {
